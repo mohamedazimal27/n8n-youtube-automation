@@ -1,0 +1,1166 @@
+{
+  "name": "quran-yt-bulk",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        752
+      ],
+      "id": "4ef637ee-f38d-429b-8a0b-b9b67fcae845",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df49ba9a-cf69-4911-8150-4d4445449e1d",
+              "name": "screen2_heading",
+              "value": "=-{{ $json.surahName }}({{ $json.surahNo }}:{{ $json.ayahNo }})",
+              "type": "string"
+            },
+            {
+              "id": "6fea1239-9d18-498e-b567-345a2b4da0c1",
+              "name": "screen2_arabicverse",
+              "value": "={{ $('Get Quran verse').item.json.arabic1 }}",
+              "type": "string"
+            },
+            {
+              "id": "65bd37c7-2a2b-4c9b-bfc7-d9fc34460f52",
+              "name": "screen2_englishtranslation",
+              "value": "={{ $('Get Quran verse').item.json.english }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        -96
+      ],
+      "id": "2e92145d-e7d6-4fdb-9d14-3e6a1212ac4e",
+      "name": "Set Variables"
+    },
+    {
+      "parameters": {
+        "url": "=https://quranapi.pages.dev/api/{{ $json.surah }}/{{ $json.ayah }}.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        32
+      ],
+      "id": "da3f8aaa-7438-4fb2-a343-ec417f0ab563",
+      "name": "Get Quran verse"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=SYSTEM PROMPT:\n\"\"\"\nYou are a Quranic content creator specializing in motivational videos. Generate EXACTLY 6 screens of text following this structure:\n\nScreen 1: Introduction\nScreen 2: Pain acknowledgment\nScreen 3: Divine silence explanation\nScreen 4: Strength assurance\nScreen 5: Resilience encouragement\nScreen 6: Call to action\n\nRULES:\n1. Use ALL CAPS throughout\n2. Match line breaks exactly as in examples\n3. Never add extra commentary\n\"\"\"\n\nUSER PROMPT TEMPLATE:\n\"\"\"\nGenerate video screens using:\nVERSE: {{ $json.arabic1 }}\nTRANSLATION: {{ $json.english }}\nREFERENCE: {{ $json.surahNo }}:{{ $json.ayahNo }}\n\nSCREEN STRUCTURE EXAMPLES:\n1| NOTE - THIS VIDEO WILL FIND YOU WHEN YOU NEED IT MOST.\n2| YOU'VE CRIED WHEN NO ONE SAW...\n3| HIS SILENCE IS NOT HIS ABSENCE...\n4| HE KNOWS YOUR STRENGTH BETTER...\n5| YOU'RE STILL STANDING...\n6| WHEN ALLAH SAYS \"BE\"...\n\nOUTPUT FORMAT:\n<screen_number>| <text_content>\n\"\"\"",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        544,
+        160
+      ],
+      "id": "9448549d-40f6-48bb-96cd-01c8c2dfb46b",
+      "name": "Basic LLM Chain",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-r1:free",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        640,
+        384
+      ],
+      "id": "5d5e40f0-a866-46ab-a14e-325f17892021",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "DcIdXKVj9kMwBuPZ",
+          "name": "OpenRouter-YT-longform"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fabb82c4-a765-480c-be4d-d9d01fd76040",
+              "name": "1_Introduction",
+              "value": "={{ $json.scene_1 }}",
+              "type": "string"
+            },
+            {
+              "id": "70394078-2bd2-44fd-b9db-1004ad94a1ba",
+              "name": "2_Pain_acknowledgment",
+              "value": "={{ $json.scene_2 }}",
+              "type": "string"
+            },
+            {
+              "id": "1dc5a718-0e2a-4420-ac0d-eab1fb869e77",
+              "name": "3_Divine_silence",
+              "value": "={{ $json.scene_3 }}",
+              "type": "string"
+            },
+            {
+              "id": "6b9cdda4-a148-4c7d-b6af-4c31cf179515",
+              "name": "5_Strength",
+              "value": "={{ $json.scene_4 }}",
+              "type": "string"
+            },
+            {
+              "id": "dfb4289a-96d9-4ed9-86f4-2271dc7194bb",
+              "name": "6_Resilience",
+              "value": "={{ $json.scene_5 }}",
+              "type": "string"
+            },
+            {
+              "id": "0351a219-865f-4e58-b5c0-e9d3117a4739",
+              "name": "7_Call",
+              "value": "={{ $json.scene_6 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        160
+      ],
+      "id": "bf7be350-3009-444a-a134-c2be04408ff5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1360,
+        32
+      ],
+      "id": "1153df7b-1054-4ada-9d67-2529a3a57fd0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const verses = [\n   \"94:2\", \"94:3\", \"94:4\", \"94:5\", \"94:6\", \n  \"103:1\", \"103:2\", \"103:3\", \"107:1\", \"107:2\", \"107:3\", \"107:4\", \"108:1\", \n  \"108:2\", \"112:1\", \"112:2\", \"112:3\", \"112:4\", \"113:1\", \"113:2\", \"113:3\", \n  \"113:4\", \"113:5\", \"114:1\", \"114:2\", \"114:3\", \"114:4\", \"114:5\", \"114:6\"\n];\n\n// Convert the array into multiple outputs (one verse per item)\nconst output = verses.map((verse) => {\n  const [surah, ayah] = verse.split(\":\");\n  return {\n    json: {\n      surah: parseInt(surah),\n      ayah: parseInt(ayah)\n    }\n  };\n});\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        240
+      ],
+      "id": "e4f29715-32bc-4c06-a2d3-904b132f2856",
+      "name": "verse number"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: (function() {\n      const inputText = $input.first().json.text;\n      const scenes = {};\n\n      // Match all scenes using regex: number + | + scene text\n      const sceneMatches = inputText.match(/(?:\\d\\|[\\s\\S]*?)(?=\\n\\d\\||$)/g);\n\n      if (!sceneMatches || sceneMatches.length !== 6) {\n        throw new Error(`Expected 6 scenes but got ${sceneMatches ? sceneMatches.length : 0}`);\n      }\n\n      sceneMatches.forEach((block, index) => {\n        const sceneMatch = block.match(/^(\\d+)\\|\\s*([\\s\\S]+)/);\n        if (sceneMatch) {\n          const sceneNum = sceneMatch[1];\n          const sceneContent = sceneMatch[2].trim();\n          scenes[`scene_${sceneNum}`] = sceneContent;\n        }\n      });\n\n      return scenes;\n    })()\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        160
+      ],
+      "id": "d886287b-e87a-4a50-95ab-c1be1fb3f94a",
+      "name": "Clean LLM text"
+    },
+    {
+      "parameters": {
+        "jsCode": "function wrapText(text, maxLen) {\n  const cleanText = text.replace(/\\n/g, ' ').trim();\n  const words = cleanText.split(' ');\n  let line = '';\n  const lines = [];\n  \n  for (const w of words) {\n    if (w.trim() === '') continue;\n    \n    const testLine = line ? `${line} ${w}` : w;\n    if (testLine.length > maxLen) {\n      if (line) lines.push(line);\n      line = w;\n    } else {\n      line = testLine;\n    }\n  }\n  if (line) lines.push(line);\n  return lines.join('\\n');\n}\n\nconst ARABIC_MAX = 90;\nconst ENG_MAX    = 70;\n\n// Extract original text fields\nconst arabic = items[0].json.screen2_arabicverse;\nconst english = items[0].json.screen2_englishtranslation;\n\n// Wrap and escape Arabic/English texts [[3]]\nitems[0].json.wrapped_arabic = JSON.stringify(wrapText(arabic, ARABIC_MAX)).slice(1, -1).replace(/\\n/g, '\\\\n');\nitems[0].json.wrapped_english = JSON.stringify(wrapText(english, ENG_MAX)).slice(1, -1).replace(/\\n/g, '\\\\n');\n\n// Wrap and escape all numbered texts [[8]]\nconst keys = [\n  '1_Introduction',\n  '2_Pain_acknowledgment',\n  '3_Divine_silence',\n  '5_Strength',\n  '6_Resilience',\n  '7_Call'\n];\nfor (const key of keys) {\n  const txt = items[0].json[key] || '';\n  const wrapped = wrapText(txt, ENG_MAX);\n  // Escape quotes and newlines explicitly\n  items[0].json[`wrapped_${key}`] = JSON.stringify(wrapped).slice(1, -1).replace(/\\n/g, '\\\\n');\n}\n\n// Calculate line counts\nconst arabicLines = items[0].json.wrapped_arabic.split('\\\\n').length;\nconst englishLines = items[0].json.wrapped_english.split('\\\\n').length;\n\n// Calculate dynamic heights\nitems[0].json.arabic_height = Math.min(35, Math.max(20, 10 + arabicLines * 5));\nitems[0].json.english_height = Math.min(30, Math.max(15, 8 + englishLines * 5));\n\n// Calculate vertical positions\nitems[0].json.arabic_y = 30 + (arabicLines * 0.5);\nitems[0].json.english_y = 50 + (arabicLines * 2) + (englishLines * 0.5);\n\n// Calculate divider position\nitems[0].json.divider_y = items[0].json.arabic_y + items[0].json.arabic_height / 2 + 2;\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        32
+      ],
+      "id": "04640028-5550-41dd-9037-13d7f5c25e23",
+      "name": "Generate variables"
+    },
+    {
+      "parameters": {
+        "jsCode": "function wrapText(text, maxLen) {\n  if (!text) return ''; // Handle empty/undefined text\n  const clean = text.toString().replace(/\\n/g, ' ').trim();\n  const words = clean.split(' ');\n  let line = '', lines = [];\n  \n  for (const w of words) {\n    if (!w) continue;\n    const test = line ? `${line} ${w}` : w;\n    \n    if (test.length > maxLen) {\n      if (line) lines.push(line);\n      line = w;\n    } else {\n      line = test;\n    }\n  }\n  \n  if (line) lines.push(line);\n  return lines.join('\\n'); // Use actual newline characters\n}\n\n// Configuration - adjust these as needed\nconst ARABIC_MAX = 90;\nconst ENG_MAX = 40;\nconst TEXT_KEYS = [\n  '1_Introduction',\n  '2_Pain_acknowledgment',\n  '3_Divine_silence',\n  '5_Strength',\n  '6_Resilience',\n  '7_Call'\n];\n\n// Process all incoming items dynamically\nreturn items.map(item => {\n  // Create a new object to avoid modifying the original\n  const newItem = JSON.parse(JSON.stringify(item.json));\n  \n  // Wrap Arabic and English verses if they exist\n  if (newItem.screen2_arabicverse) {\n    newItem.wrapped_arabic = wrapText(newItem.screen2_arabicverse, ARABIC_MAX);\n  }\n  \n  if (newItem.screen2_englishtranslation) {\n    newItem.wrapped_english = wrapText(newItem.screen2_englishtranslation, ENG_MAX);\n  }\n  \n  // Wrap all text keys that exist in the input\n  TEXT_KEYS.forEach(key => {\n    if (newItem[key]) {\n      newItem[`wrapped_${key}`] = wrapText(newItem[key], ENG_MAX);\n    }\n  });\n  \n  // Calculate dynamic heights and positions if we have the required fields\n  if (newItem.wrapped_arabic && newItem.wrapped_english) {\n    const arabicLines = newItem.wrapped_arabic.split('\\n').length;\n    const englishLines = newItem.wrapped_english.split('\\n').length;\n    \n    newItem.arabic_height = Math.min(35, Math.max(20, 10 + arabicLines * 5));\n    newItem.english_height = Math.min(30, Math.max(15, 8 + englishLines * 5));\n    newItem.arabic_y = 30 + (arabicLines * 0.5);\n    newItem.english_y = 50 + (arabicLines * 2) + (englishLines * 0.5);\n    newItem.divider_y = newItem.arabic_y + newItem.arabic_height/2 + 2;\n  }\n  \n  return { json: newItem };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        32
+      ],
+      "id": "70bccb8d-f7e5-41aa-99bc-56636ce82892",
+      "name": "Google sheet cleaner"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Yd0EneBXg96nhkl85aP9KpXaN148uvTNt8vRKp3SzPQ",
+          "mode": "list",
+          "cachedResultName": "Quran-yt-bulk",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Yd0EneBXg96nhkl85aP9KpXaN148uvTNt8vRKp3SzPQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 435216574,
+          "mode": "list",
+          "cachedResultName": "Feed for Blank template (1)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Yd0EneBXg96nhkl85aP9KpXaN148uvTNt8vRKp3SzPQ/edit#gid=435216574"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "1_Welcome": "={{ $json.wrapped_1_Introduction }}",
+            "2_Ack": "={{ $json.wrapped_2_Pain_acknowledgment }}",
+            "3_DivineSilence": "={{ $json.wrapped_3_Divine_silence }}",
+            "5_Strength": "={{ $json.wrapped_5_Strength }}",
+            "4_title": "={{ $json.screen2_heading }}",
+            "4_arabic": "={{ $json.wrapped_arabic }}",
+            "4_english": "={{ $json.wrapped_english }}",
+            "6_Reselience": "={{ $json.wrapped_6_Resilience }}",
+            "7_Call": "={{ $json.wrapped_7_Call }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "1_Welcome",
+              "displayName": "1_Welcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2_Ack",
+              "displayName": "2_Ack",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3_DivineSilence",
+              "displayName": "3_DivineSilence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5_Strength",
+              "displayName": "5_Strength",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4_title",
+              "displayName": "4_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4_arabic",
+              "displayName": "4_arabic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4_english",
+              "displayName": "4_english",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "6_Reselience",
+              "displayName": "6_Reselience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7_Call",
+              "displayName": "7_Call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blank template",
+              "displayName": "Blank template",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2016,
+        160
+      ],
+      "id": "0006f086-3860-4922-8bf7-c873fcd46a21",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2Im4bjB9tagvDiM4",
+          "name": "Google Sheets account yt-1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all()[0];\n\nif (inputData.json.arabic1 && inputData.json.arabic1.length > 150) {\n  return [\n    {\n      json: {\n        exceedsLimit: true,\n        characterCount: inputData.json.arabic1.length,\n        message: \"Arabic text exceeds 150 characters\"\n      }\n    }\n  ];\n} else {\n  // Return the original data with an added validation flag\n  return [\n    {\n      json: {\n        ...inputData.json,\n        exceedsLimit: false,\n        characterCount: inputData.json.arabic1?.length || 0\n      }\n    }\n  ];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        32
+      ],
+      "id": "5eb55127-c243-4d1c-aac5-728a00aa3ef6",
+      "name": "count arabic character",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e24962e3-f866-4725-8eaa-78455129fc6a",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "Arabic text exceeds 150 characters",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        112
+      ],
+      "id": "359fad64-dd8b-48f1-a5d6-ca4c243a1eca",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -336,
+        160
+      ],
+      "id": "96a58432-fc1a-4e67-9a28-4f6d54a56ea5",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1o864QqMVzBOFQjaXKGdyDEfZlQ_RaDYwub0Kxoir60Q",
+          "mode": "list",
+          "cachedResultName": "QuranYT-tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o864QqMVzBOFQjaXKGdyDEfZlQ_RaDYwub0Kxoir60Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o864QqMVzBOFQjaXKGdyDEfZlQ_RaDYwub0Kxoir60Q/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -688,
+        752
+      ],
+      "id": "3bc00a1e-79ee-43fa-8ea1-efea7c49e36f",
+      "name": "Google Sheets-Tracker",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FmvjlhtsdBt1wiJV",
+          "name": "Google Sheets account-Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all rows from input\nconst rows = items.map(item => item.json);\n\n// Sort by VideoID (just to be safe it's in order)\nrows.sort((a, b) => a.VideoID - b.VideoID);\n\n// Find the first row where Status is 'pending'\nconst nextPending = rows.find(row => row.Status.toLowerCase() === 'pending');\n\nif (nextPending) {\n  return [\n    {\n      json: nextPending\n    }\n  ];\n}\n\n// If no pending videos found, return nothin\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        768
+      ],
+      "id": "b51660c2-fb4a-4ac1-830c-711bfe21ad3e",
+      "name": "get next pending row",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json.VideoFilename }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1AS80L1MlHdV6KlZK7NdlY4Ye5aWKWMK4",
+            "mode": "id"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        80,
+        672
+      ],
+      "id": "68c9fb36-e2fa-4b87-b2c8-8f32408183a2",
+      "name": "Google Drive search",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bRLj7CRvx5eztkfD",
+          "name": "Google Drive account-Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "ls /home/node/quran-yt/thumbnail*"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        960,
+        768
+      ],
+      "id": "e88e4b9d-7898-4182-92b7-ef601f3fe538",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get video row from \"get next pending row\"\nconst video = $node[\"get next pending row\"].json;\n\n// Get thumbnail list (stdout) from Execute Command node\nconst thumbnailListRaw = $node[\"Execute Command\"].json.stdout;\n\n// Parse and sort the list by number in filename\nconst thumbnails = thumbnailListRaw\n  .split('\\n')\n  .filter(path => path.trim().length > 0)\n  .sort((a, b) => {\n    const numA = parseInt(a.match(/thumbnail_(\\d+)/)?.[1] || 0, 10);\n    const numB = parseInt(b.match(/thumbnail_(\\d+)/)?.[1] || 0, 10);\n    return numA - numB;\n  });\n\n// Pick thumbnail by rotating based on VideoID\nconst index = (video.VideoID - 1) % thumbnails.length;\nconst selectedThumbnail = thumbnails[index];\n\n// Add to output\nreturn [\n  {\n    json: {\n      ...video,\n      thumbnail_path: selectedThumbnail\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        768
+      ],
+      "id": "c3546a41-b143-46ea-9170-c6f5fc861d0d",
+      "name": "Code",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fileSelector": "=./quran-yt/output_thumbnail.jpeg",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        768
+      ],
+      "id": "169efff8-2504-4034-8406-c8c44ebd57c8",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        304,
+        672
+      ],
+      "id": "146ead3c-32f8-4fcc-acd5-b33a946e182d",
+      "name": "Google Drive Download",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bRLj7CRvx5eztkfD",
+          "name": "Google Drive account-Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.title }}",
+        "regionCode": "SG",
+        "categoryId": "=29",
+        "options": {
+          "description": "={{ $json.description }}",
+          "privacyStatus": "private",
+          "publishAt": "={{ $('get next pending row').item.json.upload_time }}",
+          "tags": "={{ $json.hashtags.split(' ').join(', ') }}"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        752,
+        768
+      ],
+      "id": "0033303c-d76e-4844-8cc8-7203a323aa9d",
+      "name": "YouTube",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "r00VaIzeG70B9r1F",
+          "name": "YouTube account Quran"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Predefined list of title/description/hashtag sets\nconst items = [\n  {\n    title: \"This Quran verse will light your darkest hours\",\n    description: \"Find solace in Allah’s words as we reflect on a verse that brings clarity and calm in times of uncertainty. May this divine message soothe your heart. 🌟 Like, share, & subscribe!\",\n    hashtags: \"#quran #islam #allah #muslim #quranquotes #islamicreminder #dua\"\n  },\n  {\n    title: \"A Quran verse to heal your broken spirit\",\n    description: \"Dive into the healing power of Qur’an—awaken your soul through this verse that reminds us our wounds can be healed by faith. 🌙 Share & subscribe!\",\n    hashtags: \"#quran #healing #faith #spirituality #islamicquotes #allah\"\n  },\n  {\n    title: \"When you feel lost—this Quran verse will guide you\",\n    description: \"Feel lost? This powerful verse offers direction and strength when life seems confusing. 🙏 Share with those in need. Subscribe for more reminders.\",\n    hashtags: \"#quran #guidance #hope #islamicreminder #muslim\"\n  },\n  {\n    title: \"This Quran verse calms your anxious heart\",\n    description: \"Anxiety meets peace in the divine promise of Allah. Join us as we reflect on a verse that brings tranquility to the restless soul. Like and share for blessings.\",\n    hashtags: \"#quran #anxietyrelief #peace #islam #islamicquotes\"\n  },\n  {\n    title: \"A Quran verse to uplift your spirit today\",\n    description: \"Let this verse uplift your spirit and remind you: Allah’s mercy is ever near. 💡 Loved it? Share with others! Subscribe and comment your experience.\",\n    hashtags: \"#quran #spiritualupliift #mercy #allah #dua\"\n  },\n  {\n    title: \"This Quran verse renews hope in hard times\",\n    description: \"Hard times don’t last—this verse renews our hope and belief in Allah’s plan. ❤️ Share this message. Subscribe for more spiritual reflections!\",\n    hashtags: \"#quran #hope #trustingeverything #islamicreminders\"\n  },\n  {\n    title: \"When fear overwhelms you—this Quran verse speaks\",\n    description: \"A verse full of courage and trust in Allah when fear takes over. Let its words inspire resilience. Share & subscribe to uplift others.\",\n    hashtags: \"#quran #courage #resilience #islam #allah\"\n  },\n  {\n    title: \"A Quran verse for strength in adversity\",\n    description: \"Facing trials? Let this verse remind you: Allah never leaves those who rely on Him. 🌿 Like, share, and subscribe for daily reminders.\",\n    hashtags: \"#quran #strength #adversity #islamicreminder\"\n  },\n  {\n    title: \"This Quran verse awakens your faith again\",\n    description: \"Sometimes we lose faith—but Allah’s words reignite the spark. Reflect with us on this verse of renewal. Share with loved ones.\",\n    hashtags: \"#quran #faith #renewal #allah #islam\"\n  },\n  {\n    title: \"A Quran verse that restores peace in your heart\",\n    description: \"Discover inner peace through this comforting verse from the Holy Qur’an—allowing divine tranquility to wash over your soul. 🙏 Share kindness.\",\n    hashtags: \"#quran #peace #tranquility #islamicquotes #allah\"\n  }\n];\n\n// Pick a random entry\nconst pick = items[Math.floor(Math.random() * items.length)];\n\n// Return combined with original video data\nreturn [\n  {\n    json: {\n      ...$node[\"get next pending row\"].json,\n      title: pick.title,\n      description: pick.description,\n      hashtags: pick.hashtags\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        832
+      ],
+      "id": "6a06ea9e-3bae-4daf-9111-54ad908adc11",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "command": "=magick {{ $json.thumbnail_path }} -resize 1280x720\\! /home/node/quran-yt/output_thumbnail.jpeg"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        768
+      ],
+      "id": "d410f472-131d-4b5e-a924-dbb4b79cf3ad",
+      "name": "Execute Command1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/youtube/v3/thumbnails/set",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "videoId",
+              "value": "={{ $('YouTube').item.json.uploadId }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        768
+      ],
+      "id": "5418ef0f-a421-4dfb-a4e6-13ccd87487e7",
+      "name": "HTTP Request",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "r00VaIzeG70B9r1F",
+          "name": "YouTube account Quran"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -480,
+        752
+      ],
+      "id": "6611419f-c17a-4187-bd11-dea2cb5b43ac",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1o864QqMVzBOFQjaXKGdyDEfZlQ_RaDYwub0Kxoir60Q",
+          "mode": "list",
+          "cachedResultName": "QuranYT-tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o864QqMVzBOFQjaXKGdyDEfZlQ_RaDYwub0Kxoir60Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o864QqMVzBOFQjaXKGdyDEfZlQ_RaDYwub0Kxoir60Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "done",
+            "VideoID": "={{ $('Loop Over Items1').item.json.VideoID }}"
+          },
+          "matchingColumns": [
+            "VideoID"
+          ],
+          "schema": [
+            {
+              "id": "VideoID",
+              "displayName": "VideoID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "VideoFilename",
+              "displayName": "VideoFilename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "YouTubeURL",
+              "displayName": "YouTubeURL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ErrorMessage",
+              "displayName": "ErrorMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "upload_time",
+              "displayName": "upload_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2064,
+        768
+      ],
+      "id": "2ae21dc7-41c8-48c6-8a63-82340ee5c6e1",
+      "name": "Set tracker done",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FmvjlhtsdBt1wiJV",
+          "name": "Google Sheets account-Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        512,
+        752
+      ],
+      "id": "bf8d6139-afd9-42ca-83d7-1c36da05f594",
+      "name": "Merge1",
+      "alwaysOutputData": true,
+      "executeOnce": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets-Tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Quran verse": {
+      "main": [
+        [
+          {
+            "node": "count arabic character",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Clean LLM text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Generate variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verse number": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean LLM text": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate variables": {
+      "main": [
+        [
+          {
+            "node": "Google sheet cleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google sheet cleaner": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "count arabic character": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "verse number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Quran verse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets-Tracker": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get next pending row": {
+      "main": [
+        [
+          {
+            "node": "Google Drive search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive search": {
+      "main": [
+        [
+          {
+            "node": "Google Drive Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Download": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "YouTube": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "get next pending row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Set tracker done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set tracker done": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5c9a8c2a-8c59-4d24-b362-43a2da92b2c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a3f60db27e0c24a644accff1dd34d848a96b7ea52781099f0ba86533005ea6ca"
+  },
+  "id": "VdvDBMh9862kO1mN",
+  "tags": []
+}

@@ -1,0 +1,104 @@
+{
+  "nodes": [
+    {
+      "id": "581f811a-1a94-46f6-9a8d-4c7851ab34d0",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-2640, 912]
+    },
+    {
+      "id": "a6375071-7fee-4d09-94c4-21d8c6dc3813",
+      "name": "Set Theme",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-2416, 912],
+      "parameters": {
+        "jsCode": "// Theme + setting selector (sanitized)\nconst themeBundles = [\n  {\n    theme: \"Based on real events: The Dyatlov Pass incident, reimagined.\",\n    settings: [\"A tent torn open from the inside, footprints leading into snow.\"]\n  }\n];\n\nconst bundle = themeBundles[Math.floor(Math.random() * themeBundles.length)];\nconst duration = 20;\n\nreturn [{\n  json: {\n    theme_input: bundle.theme,\n    setting_input: bundle.settings[0],\n    duration\n  }\n}];"
+      }
+    },
+    {
+      "id": "a18a4a17-fa46-4430-a0bc-fe9407e3a420",
+      "name": "Generate Horror Story",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [-2224, 912],
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a {{ $json.duration }}-minute horror narration.\nTheme: {{ $json.theme_input }}\nSetting: {{ $json.setting_input }}"
+      }
+    },
+    {
+      "id": "245f1f1d-3b58-45d1-9dbf-18e406c3b5f8",
+      "name": "LLM Model (OpenRouter)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [-2224, 1120],
+      "parameters": {
+        "model": "deepseek/deepseek-r1:free",
+        "options": {
+          "temperature": 0.8
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "3c73d0b5-1fb0-4f46-9148-284fc6fda02c",
+      "name": "TTS Service",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [0, 0],
+      "parameters": {
+        "method": "POST",
+        "url": "http://YOUR_TTS_SERVICE/v1/audio/speech",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"model\": \"kokoro\", \"input\": \"{{ $json.sceneText }}\" }"
+      }
+    },
+    {
+      "id": "bc27fb50-da21-48e8-9c1a-f369c0a2460b",
+      "name": "Image Generation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [768, 1264],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"model\": \"FLUX.1\", \"prompt\": \"{{ $json.text }}\" }"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "a988e1fe-1354-494f-a223-70cec6f59be2",
+      "name": "YouTube Upload",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [3408, 944],
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.title }}",
+        "privacyStatus": "unlisted"
+      },
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [[{ "node": "Set Theme", "type": "main", "index": 0 }]]
+    },
+    "Set Theme": {
+      "main": [[{ "node": "Generate Horror Story", "type": "main", "index": 0 }]]
+    },
+    "LLM Model (OpenRouter)": {
+      "ai_languageModel": [[{ "node": "Generate Horror Story", "type": "ai_languageModel", "index": 0 }]]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
+
